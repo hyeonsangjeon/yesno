@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yes or No</title>
+    <style>
+        /* CSS to set the width of the images */
+        img {
+            width: 300px;
+            height: auto;
+            margin-right: 20px; /* Add some space between the buttons */
+        }
+        /* CSS to align buttons horizontally */
+        .button-container {
+            display: flex;
+            align-items: center;
+        }
+        /* Styling the count numbers */
+        .count {
+            font-size: 24px; /* Increase font size */
+            color: white; /* Text color */
+            background-color: #333; /* Background color */
+            padding: 10px; /* Add some padding */
+            border-radius: 5px; /* Rounded corners */
+            margin-top: 10px; /* Space between the image and the count */
+            width: 60px; /* Fixed width */
+            text-align: center; /* Center the text */
+        }
+        /* Styling the reset button */
+        button {
+            font-size: 18px; /* Font size */
+            padding: 10px 20px; /* Padding */
+            background-color: #007BFF; /* Background color */
+            color: white; /* Text color */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Hand cursor on hover */
+            margin-top: 20px; /* Space above the button */
+            transition: background-color 0.3s; /* Transition effect */
+        }
+        /* Hover effect for the reset button */
+        button:hover {
+            background-color: #0056b3; /* Darken the background color on hover */
+        }
+    </style>
+    <script>
+        // JavaScript function to handle button clicks and update count
+        function incrementCount(buttonId, countId) {
+            let countElement = document.getElementById(countId);
+            let currentCount = parseInt(countElement.innerText);
+            countElement.innerText = currentCount + 1;
+        }
+
+        // JavaScript function to reset both counts to 0
+        function resetCounts() {
+            document.getElementById('yesCount').innerText = "0";
+            document.getElementById('noCount').innerText = "0";
+        }
+    </script>
+</head>
+<body>
+
+<div class="button-container">
+    <!-- Yes Button -->
+    <div>
+        <img src="../static/yes.png" alt="Yes" style="cursor:pointer;" onclick="incrementCount('yesButton', 'yesCount')">
+        <div id="yesCount" class="count">0</div>
+    </div>
+
+    <!-- No Button -->
+    <div>
+        <img src="../static/no.png" alt="No" style="cursor:pointer;" onclick="incrementCount('noButton', 'noCount')">
+        <div id="noCount" class="count">0</div>
+    </div>
+</div>
+
+<!-- Reset Button -->
+<button onclick="resetCounts()">Reset Counts</button>
+
+</body>
+</html>
