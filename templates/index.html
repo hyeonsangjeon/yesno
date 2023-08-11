@@ -44,39 +44,63 @@
             background-color: #0056b3; /* Darken the background color on hover */
         }
     </style>
-    <script>
+     <script>
+        // JavaScript function to get counts from server
+        function getCountsFromServer() {
+            fetch('/get_counts')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('yesCount').innerText = data.yes;
+                document.getElementById('noCount').innerText = data.no;
+            });
+        }
+
+        // JavaScript function to update counts on server
+        function updateCountsOnServer(yes, no) {
+            fetch('/update_counts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "yes": yes, "no": no })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+            });
+        }
+
         // JavaScript function to handle button clicks and update count
         function incrementCount(buttonId, countId) {
             let countElement = document.getElementById(countId);
             let currentCount = parseInt(countElement.innerText);
             currentCount += 1;
             countElement.innerText = currentCount;
-            localStorage.setItem(countId, currentCount); // Save the updated count to local storage
+
+            if (countId === 'yesCount') {
+                updateCountsOnServer(currentCount, parseInt(document.getElementById('noCount').innerText));
+            } else {
+                updateCountsOnServer(parseInt(document.getElementById('yesCount').innerText), currentCount);
+            }
         }
 
         // JavaScript function to reset both counts to 0
         function resetCounts() {
             document.getElementById('yesCount').innerText = "0";
             document.getElementById('noCount').innerText = "0";
-            localStorage.setItem('yesCount', 0); // Reset the value in local storage
-            localStorage.setItem('noCount', 0); // Reset the value in local storage
+            updateCountsOnServer(0, 0);
         }
 
-        // Load counts from local storage when the page loads
+        // Load counts from server when the page loads
         window.onload = function() {
-            if (localStorage.getItem('yesCount')) {
-                document.getElementById('yesCount').innerText = localStorage.getItem('yesCount');
-            }
-            if (localStorage.getItem('noCount')) {
-                document.getElementById('noCount').innerText = localStorage.getItem('noCount');
-            }
+            getCountsFromServer();
         }
     </script>
 </head>
 <body>
 
 <div class="button-container">
-   <!-- Yes Button -->
+    <!-- Yes Button -->
     <div>
         <img src="../static/yes.png" alt="Yes" style="cursor:pointer;" onclick="incrementCount('yesButton', 'yesCount')">
         <div id="yesCount" class="count">0</div>
