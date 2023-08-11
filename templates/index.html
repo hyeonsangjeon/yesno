@@ -49,20 +49,34 @@
         function incrementCount(buttonId, countId) {
             let countElement = document.getElementById(countId);
             let currentCount = parseInt(countElement.innerText);
-            countElement.innerText = currentCount + 1;
+            currentCount += 1;
+            countElement.innerText = currentCount;
+            localStorage.setItem(countId, currentCount); // Save the updated count to local storage
         }
 
         // JavaScript function to reset both counts to 0
         function resetCounts() {
             document.getElementById('yesCount').innerText = "0";
             document.getElementById('noCount').innerText = "0";
+            localStorage.setItem('yesCount', 0); // Reset the value in local storage
+            localStorage.setItem('noCount', 0); // Reset the value in local storage
+        }
+
+        // Load counts from local storage when the page loads
+        window.onload = function() {
+            if (localStorage.getItem('yesCount')) {
+                document.getElementById('yesCount').innerText = localStorage.getItem('yesCount');
+            }
+            if (localStorage.getItem('noCount')) {
+                document.getElementById('noCount').innerText = localStorage.getItem('noCount');
+            }
         }
     </script>
 </head>
 <body>
 
 <div class="button-container">
-    <!-- Yes Button -->
+   <!-- Yes Button -->
     <div>
         <img src="../static/yes.png" alt="Yes" style="cursor:pointer;" onclick="incrementCount('yesButton', 'yesCount')">
         <div id="yesCount" class="count">0</div>
