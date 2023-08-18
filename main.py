@@ -56,8 +56,10 @@ def get_initial_counts():
 #     return jsonify(yes=yes_count, no=no_count)
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/<path>')
+def index(path=None):
+    is_admin = path == 'aimltfcadmin'
+    return render_template('index.html', is_admin=is_admin)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
