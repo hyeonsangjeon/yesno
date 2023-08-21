@@ -2,13 +2,18 @@
 from flask import Flask, render_template,jsonify, request
 from flask_socketio import SocketIO, emit
 from flask_caching import Cache
+from threading import Lock
+
 
 import os
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+#socketio = SocketIO(app)
+socketio = SocketIO(app, engineio_logger=True, max_http_buffer_size=10*1024*1024,async_mode='threading')
+
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
+
 
 # Construct the file path relative to the script directory
 file_name = os.path.join(script_dir, 'counts.txt')
@@ -33,18 +38,24 @@ def write_counts_to_cache(yes_count, no_count):
     cache.set('yes_count', yes_count)
     cache.set('no_count', no_count)
 
-
+cache_lock = Lock()
 @socketio.on('increment')
 def handle_increment(data):
-    yes_count, no_count = read_counts_from_cache()
-    print("data['countId'] : ", data['countId'])
-    if data['countId'] == 'yesCount':
-        yes_count += 1
-        emit('update_count', {'countId': data['countId'], 'value': yes_count}, broadcast=True)
-    else:
-        no_count += 1
-        emit('update_count', {'countId': data['countId'], 'value': no_count}, broadcast=True)
-    write_counts_to_cache(yes_count, no_count)
+    with cache_lock:  # 캐시 액세스를 동기화
+        yes_count, no_count = read_counts_from_cache()
+
+        # count value from client
+        client_value = data['value'] + 1
+
+        if data['countId'] == 'yesCount' and client_value > yes_count:
+            yes_count = client_value
+            write_counts_to_cache(yes_count, no_count)
+            emit('update_count', {'countId': data['countId'], 'value': yes_count}, broadcast=True)
+        elif data['countId'] == 'noCount' and client_value > no_count:
+            no_count = client_value
+            write_counts_to_cache(yes_count, no_count)
+            emit('update_count', {'countId': data['countId'], 'value': no_count}, broadcast=True)
+
 
 
 @socketio.on('reset_counts')
